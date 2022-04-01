@@ -47,7 +47,7 @@ function setDate(m, date, month, year) {
 }
 
 function setQuarterDates(m, year) {
-	m.month(m.month() + 1);
+	m.month(m.month() + 3);
 	m.date(1);
 	m.year(year);
 }
@@ -60,18 +60,23 @@ function setQuarterDates(m, year) {
 //TODO Question 2
 
 function getFirstMondayOfYear(year) {
+	if (typeof year !== "number") throw Error("Must Enter A Number");
+	if (year < 1101) throw Error("Year too low. Limit Year: 1101");
+
 	let m = moment().year(year).month(0).date(1).day(8);
 	if (m.date() > 7) m.day(-6);
 
 	return m.format("L");
 }
 
-// console.log("First Monday falls on", getFirstMondayOfYear(2021));
+// console.log("First Monday falls on", getFirstMondayOfYear(2022));
 
 //TODO Question 3
 
 function getLastMondayOfYear(year) {
+	if (typeof year !== "number") throw Error("Must Enter A Number");
 	if (year < 1100) throw Error("Year too low. Limit Year: 1100");
+
 	let m = moment().year(year).month(11).date(24);
 	let lastMonday;
 	for (let i = m.date(); i <= 31; i++) {
@@ -92,6 +97,8 @@ function differenceBetweenTwoDatesAndTime(date1, time1, date2, time2) {
 	if (!date1 || !date2 || !time1 || !time2) throw Error("Missing Input");
 	if (!time1.includes(":") || !time2.includes(":"))
 		throw Error("Improper Time Format.");
+	if (!date1.includes("/") || !date2.includes("/"))
+		throw Error("Accepted Input: MM/DD/YYYY");
 
 	//Formatting the dates to standard format
 	date1 = formatAnyInputToStandardDate(date1);
@@ -342,6 +349,7 @@ function getAllSpecificDays(year, month, dayOfWeek) {
 		m.date(i);
 		if (m.day() === dayNumber) {
 			collectedDates.push(m.format("L"));
+			i += 6;
 		}
 	}
 
@@ -351,15 +359,23 @@ function getAllSpecificDays(year, month, dayOfWeek) {
 
 //TODO Question 10
 function getWeekOfYear(date) {
+	if (
+		typeof date !== "string" ||
+		!date.includes("/") ||
+		date.includes(":") ||
+		date.length > 10
+	)
+		throw Error("Accepted Input: MM/DD/YYYY");
+
 	date = formatAnyInputToStandardDate(date);
 	let overSpill = false;
 	date = date.toString().split("/");
 	date[0] = Number(date[0]) + 1;
-	let leap = moment().year(date[2]);
+	let givenYear = moment().year(date[2]);
 
-	if (date[1] > 29 && date[0] === 2 && leap.isLeapYear())
+	if (date[1] > 29 && date[0] === 2 && givenYear.isLeapYear())
 		throw Error("February only has 29 days.");
-	else if (date[1] > 28 && date[0] === 2 && !leap.isLeapYear())
+	else if (date[1] > 28 && date[0] === 2 && !givenYear.isLeapYear())
 		throw Error("February only has 28 days.");
 
 	if (date[0] === 13) {
@@ -372,14 +388,14 @@ function getWeekOfYear(date) {
 	date = formatAnyInputToStandardDate(date);
 	let feb1 = moment().month(1).startOf("month");
 	let givenDate = moment(formatDateForMomentInput(date));
-	let dateGivenWeek;
-	if (overSpill) dateGivenWeek = givenDate.week() + 53;
+	let weekOfGivenDate;
+	if (overSpill) weekOfGivenDate = givenDate.week() + 53;
 	else {
-		dateGivenWeek = givenDate.week();
+		weekOfGivenDate = givenDate.week();
 	}
 	let febWeek = feb1.week();
 
-	return dateGivenWeek - febWeek + 1;
+	return weekOfGivenDate - febWeek + 1;
 }
 
 // console.log("Week", getWeekOfYear("12/29/2022"));
