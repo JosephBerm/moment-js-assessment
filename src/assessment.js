@@ -355,6 +355,7 @@ function getAllSpecificDays(year, month, dayOfWeek) {
 
 	return collectedDates;
 }
+
 // console.log(getAllSpecificDays(2022, 3, "Tuesday"));
 
 //TODO Question 10
